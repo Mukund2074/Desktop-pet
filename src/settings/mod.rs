@@ -10,6 +10,8 @@ pub struct AppSettings {
     pub anim_speed: f64,
     #[serde(default = "default_walk_freq")]
     pub walk_freq: f64,
+    #[serde(default = "default_walk_interval")]
+    pub walk_interval: String,
     #[serde(default = "default_true")]
     pub always_on_top: bool,
     #[serde(default)]
@@ -28,6 +30,7 @@ pub struct Position {
 fn default_pet_size() -> f64 { 1.0 }
 fn default_anim_speed() -> f64 { 1.0 }
 fn default_walk_freq() -> f64 { 0.5 }
+fn default_walk_interval() -> String { "auto".to_string() }
 fn default_true() -> bool { true }
 
 impl Default for AppSettings {
@@ -36,6 +39,7 @@ impl Default for AppSettings {
             pet_size: 1.0,
             anim_speed: 1.0,
             walk_freq: 0.5,
+            walk_interval: default_walk_interval(),
             always_on_top: true,
             sound: false,
             autostart: false,

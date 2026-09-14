@@ -1,6 +1,6 @@
 [package]
 name = "desktop-pet"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "A cute transparent desktop pet - tiny pixel cat living on your desktop. Offline, private, lightweight."
 authors = ["Desktop Pet"]

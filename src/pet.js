@@ -345,6 +345,7 @@ const defaults = {
   petSize: 1,
   animSpeed: 1,
   walkFreq: 0.5,
+  walk_interval: "auto",
   alwaysOnTop: true,
   sound: false,
   autostart: false,
@@ -360,7 +361,14 @@ async function loadSettings() {
       const value = await store.get(key);
       if (value !== undefined && value !== null) settings[key] = value;
     }
+    // migration: older versions stored walkInterval (camelCase)
+    try {
+      const legacy = await store.get("walkInterval");
+      if (legacy && !settings.walk_interval) settings.walk_interval = legacy;
+    } catch {}
     try { const saved = await invoke("get_settings"); if (saved) settings = { ...settings, ...saved }; } catch {}
+    // ensure walk_interval has a value
+    if (!settings.walk_interval) settings.walk_interval = "auto";
   } catch (err) { console.warn("store load fail", err); }
   applySettings();
 }
@@ -721,12 +729,24 @@ async function moveWindowTo(targetX, targetY, animate = true, duration = 1200) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Autonomous behavior loop
+// Autonomous behavior loop — respects walk_interval (auto/30s/1m/2m/5m/still)
 // ─────────────────────────────────────────────────────────────
+let lastWalkAt = 0;
+function getWalkIntervalMs() {
+  const v = settings.walk_interval || "auto";
+  if (v === "still") return Infinity;
+  if (v === "auto") return null;
+  const n = parseInt(v, 10);
+  return Number.isFinite(n) ? n * 1000 : null;
+}
 async function randomWalk() {
   if (isDragging) return;
   const roll = Math.random();
   const walkFreq = settings.walkFreq ?? 0.5;
+  const intervalMs = getWalkIntervalMs();
+  const now = Date.now();
+  const isStill = intervalMs === Infinity;
+  const shouldForceWalk = intervalMs !== null && !isStill && (now - lastWalkAt >= intervalMs);
 
   if (roll < 0.12) {
     setAnimation("sitting");
@@ -748,7 +768,10 @@ async function randomWalk() {
     scheduleNext(1800 + Math.random() * 2500);
     return;
   }
-  if (roll < walkFreq + 0.15) {
+  // Walk interval: still = never walk, fixed interval = force walk when elapsed, auto = random
+  const doWalk = isStill ? false : (shouldForceWalk || roll < walkFreq + 0.15);
+  if (doWalk) {
+    lastWalkAt = Date.now();
     const bounds = await getScreenBounds();
     const winSize = isTauri ? await petWindow.outerSize().catch(() => ({ width: 160, height: 160 })) : { width: 160, height: 160 };
     const pad = 12;
@@ -1001,6 +1024,21 @@ if (isTauri && listenFn) {
       }
     });
     await listenFn("show-pet", async () => { await petWindow.show(); await petWindow.setFocus(); });
+    await listenFn("sit-still", async () => {
+      if (behaviorTimer) clearTimeout(behaviorTimer);
+      setAnimation("sitting");
+      showBubble("…sitting still 🧘");
+      // stay sitting, don't walk until interval changes
+      scheduleNext(4000 + Math.random() * 2000);
+    });
+    await listenFn("play-now", async () => {
+      if (behaviorTimer) clearTimeout(behaviorTimer);
+      setAnimation("play");
+      showBubble("Let's play! 🧶");
+      setTimeout(() => setAnimation("happy"), 1400);
+      setTimeout(() => setAnimation("idle"), 2200);
+      scheduleNext(1500);
+    });
   } catch {}
 }
 

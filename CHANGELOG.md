@@ -2,6 +2,13 @@
 
 All notable changes to Desktop Pet will be documented here.
 
+## [0.2.0] - 2026-09-14
+
+### Added
+- Walk interval setting: Auto (1–4s random), Every 30s, 1m, 2m, 5m, Sit still (no walk) — `walk_interval` in `AppSettings` + `settings.html` select
+- Sit still and Play quick actions in Settings (🧘 Sit still, 🧶 Play) + `sit-still`/`play-now` Tauri events in `pet.js`
+- `getWalkIntervalMs()` helper and `lastWalkAt` tracking — respects `still` (never walk) and fixed intervals (force walk when elapsed)
+
 ## [0.1.0] - 2026-09-14
 
 ### Added

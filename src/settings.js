@@ -43,6 +43,9 @@ const els = {
   animSpeedVal: document.getElementById("animSpeedVal"),
   walkFreq: document.getElementById("walkFreq"),
   walkFreqVal: document.getElementById("walkFreqVal"),
+  walkInterval: document.getElementById("walkInterval"),
+  sitStill: document.getElementById("sitStill"),
+  playNow: document.getElementById("playNow"),
   resetPos: document.getElementById("resetPos"),
   showPet: document.getElementById("showPet"),
   quit: document.getElementById("quit"),
@@ -52,6 +55,7 @@ let settings = {
   petSize: 1,
   animSpeed: 1,
   walkFreq: 0.5,
+  walk_interval: "auto",
   alwaysOnTop: true,
   sound: false,
 };
@@ -61,12 +65,16 @@ async function load() {
     const v = await store.get(k).catch(()=>undefined);
     if (v !== undefined && v !== null) settings[k] = v;
   }
+  // migration: handle camelCase walkInterval from older versions
+  const legacy = await store.get("walkInterval").catch(()=>undefined);
+  if (legacy && !settings.walk_interval) settings.walk_interval = legacy;
   try { const s = await invoke("get_settings"); if (s) settings = { ...settings, ...s }; } catch {}
   try { settings.autostart = await isEnabled(); } catch {}
 
   els.petSize.value = String(settings.petSize);
   els.animSpeed.value = String(settings.animSpeed);
   els.walkFreq.value = String(settings.walkFreq);
+  if (els.walkInterval) els.walkInterval.value = settings.walk_interval || "auto";
   els.alwaysOnTop.checked = !!settings.alwaysOnTop;
   els.sound.checked = !!settings.sound;
   els.autostart.checked = !!settings.autostart;
@@ -83,6 +91,7 @@ async function save() {
   settings.petSize = parseFloat(els.petSize.value);
   settings.animSpeed = parseFloat(els.animSpeed.value);
   settings.walkFreq = parseFloat(els.walkFreq.value);
+  settings.walk_interval = els.walkInterval ? els.walkInterval.value : settings.walk_interval;
   settings.alwaysOnTop = els.alwaysOnTop.checked;
   settings.sound = els.sound.checked;
 
@@ -102,9 +111,17 @@ async function save() {
   els.animSpeed.addEventListener(ev, () => { updateLabels(); save(); });
   els.walkFreq.addEventListener(ev, () => { updateLabels(); save(); });
 });
+if (els.walkInterval) els.walkInterval.addEventListener("change", save);
 els.alwaysOnTop.addEventListener("change", save);
 els.sound.addEventListener("change", save);
 els.autostart.addEventListener("change", save);
+if (els.sitStill) els.sitStill.addEventListener("click", async () => {
+  await emit("sit-still", {}).catch(()=>{});
+  try { await invoke("set_always_on_top", { enabled: settings.alwaysOnTop }); } catch {}
+});
+if (els.playNow) els.playNow.addEventListener("click", async () => {
+  await emit("play-now", {}).catch(()=>{});
+});
 
 els.resetPos.addEventListener("click", async () => {
   await emit("reset-position", {}).catch(()=>{});

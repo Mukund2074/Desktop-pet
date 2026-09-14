@@ -30,6 +30,21 @@
         <input type="range" id="walkFreq" min="0.2" max="1" step="0.1" value="0.5" />
         <span id="walkFreqVal">50%</span>
       </label>
+      <label>Walk interval
+        <select id="walkInterval">
+          <option value="auto">Auto (1–4s random)</option>
+          <option value="30">Every 30 seconds</option>
+          <option value="60">Every 1 minute</option>
+          <option value="120">Every 2 minutes</option>
+          <option value="300">Every 5 minutes</option>
+          <option value="still">Sit still (no walk)</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="actions">
+      <button id="sitStill">🧘 Sit still</button>
+      <button id="playNow">🧶 Play</button>
     </section>
 
     <section class="actions">
@@ -48,7 +63,7 @@
       </ul>
     </section>
 
-    <footer>v0.1.0 — offline only</footer>
+    <footer>v0.2.0 — offline only</footer>
   </div>
   <script type="module" src="/src/settings.js"></script>
 </body>
