@@ -8,18 +8,9 @@
   <style>html,body{background:transparent !important;background-color:rgba(0,0,0,0) !important;}</style>
 </head>
 <body>
-  <div id="pet-stage" data-testid="pet-stage" data-tauri-drag-region>
-    <!-- SVG pet injected here by pet.js -->
-    <div id="pet" data-testid="pet" data-tauri-drag-region></div>
-    <div id="shadow"></div>
+  <div id="desktop-viewport" data-tauri-drag-region></div>
 
-    <!-- Speech bubble -->
-    <div id="bubble" class="hidden">
-      <span id="bubble-text"></span>
-    </div>
-  </div>
-
-  <!-- Context menu -->
+  <!-- Context menu (right-click only) -->
   <div id="ctx-menu" class="hidden" role="menu">
     <button data-action="feed" role="menuitem">🐟 &nbsp; Feed</button>
     <button data-action="play" role="menuitem">🧶 Play</button>

@@ -1,3 +1,10 @@
+:root {
+  --ui-bg: rgba(255, 255, 255, 0.85);
+  --ui-border: rgba(200, 210, 230, 0.6);
+  --ui-text: #4a5568;
+  --ui-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
@@ -5,98 +12,91 @@ html, body {
   height: 100%;
   overflow: hidden;
   background: transparent !important;
-  background-color: transparent !important;
+  background-color: rgba(0,0,0,0) !important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   user-select: none;
   -webkit-user-select: none;
 }
-html { background-color: rgba(0,0,0,0) !important; }
 
-body {
-  background: transparent;
-  cursor: grab;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-body:active { cursor: grabbing; }
 [data-tauri-drag-region] { -webkit-app-region: drag; app-region: drag; }
-#ctx-menu, #ctx-menu button, #bubble { -webkit-app-region: no-drag; app-region: no-drag; }
+#ctx-menu, #ctx-menu button { -webkit-app-region: no-drag; app-region: no-drag; }
 
-#pet-stage {
-  width: 160px;
-  height: 160px;
+#desktop-viewport {
   position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  --scale: 1;
-  transform: scale(var(--scale));
-  transform-origin: bottom center;
-}
-
-/* SVG pet container — must overflow so tails/ears extending outside viewBox are visible */
-#pet {
-  position: relative;
-  width: 130px;
-  height: 130px;
-  overflow: visible;
-  cursor: grab;
-}
-
-#pet:active { cursor: grabbing; }
-
-#pet .pet-svg {
-  overflow: visible;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
-/* Shadow under pet */
-#shadow {
+.pet-wrapper {
   position: absolute;
-  bottom: 4px;
+  width: 130px;
+  height: 130px;
+  cursor: grab;
+  will-change: transform, left, top;
+  filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.12));
+  z-index: 10;
+  transition: filter 0.2s ease;
+}
+.pet-wrapper:active { cursor: grabbing; }
+.pet-wrapper.dragging {
+  filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.2));
+  z-index: 1000 !important;
+}
+.pet-svg { width: 100%; height: 100%; overflow: visible; }
+
+.particle-container {
+  position: absolute;
+  top: -20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 52px;
-  height: 12px;
-  background: rgba(0,0,0,0.14);
-  border-radius: 50%;
-  filter: blur(3px);
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
 }
-
-/* Bubble */
-#bubble {
+.floating-particle {
   position: absolute;
-  top: 0px;
+  font-size: 18px;
+  animation: floatUp 1s ease-out forwards;
+  opacity: 0;
+}
+@keyframes floatUp {
+  0% { transform: translateY(0px) scale(0.5); opacity: 1; }
+  100% { transform: translateY(-40px) scale(1.2); opacity: 0; }
+}
+.pet-speech {
+  position: absolute;
+  top: -35px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) scale(0);
   background: white;
-  color: #333;
-  font-family: ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+  padding: 5px 10px;
+  border-radius: 12px;
   font-size: 11px;
-  font-weight: 600;
-  padding: 4px 9px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.13);
+  font-weight: 700;
+  color: var(--ui-text);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   white-space: nowrap;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   pointer-events: none;
-  border: 1.5px solid #f1f5f9;
+  border: 2px solid #edf2f7;
 }
-#bubble.hidden { display: none; }
-#bubble::after {
+.pet-speech::after {
   content: '';
   position: absolute;
   bottom: -5px;
   left: 50%;
   transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-top-color: white;
-  border-bottom: none;
+  border-width: 5px 5px 0;
+  border-style: solid;
+  border-color: white transparent;
+  display: block;
+  width: 0;
 }
+.pet-wrapper:hover .pet-speech { transform: translateX(-50%) scale(1); }
 
-/* Context menu */
 #ctx-menu {
   position: fixed;
   min-width: 160px;
@@ -107,7 +107,7 @@ body:active { cursor: grabbing; }
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.14);
   padding: 6px;
-  z-index: 999;
+  z-index: 9999;
   font-family: system-ui, -apple-system, sans-serif;
 }
 #ctx-menu.hidden { display: none; }

@@ -19,6 +19,8 @@ pub struct AppSettings {
     #[serde(default)]
     pub autostart: bool,
     pub pos: Option<Position>,
+    #[serde(default)]
+    pub pet_type: String,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -44,6 +46,7 @@ impl Default for AppSettings {
             sound: false,
             autostart: false,
             pos: None,
+            pet_type: "kitten".to_string(),
         }
     }
 }
@@ -135,26 +138,12 @@ pub fn set_always_on_top(app: AppHandle, enabled: bool) -> Result<(), String> {
     Ok(())
 }
 
-#[tauri::command]
-pub fn debug_log(msg: String) -> String {
-    let _ = std::fs::OpenOptions::new().create(true).append(true).open("/tmp/pet.log").and_then(|mut f| {
-        use std::io::Write;
-        writeln!(f, "{}", msg)
-    });
-    println!("[pet-debug] {}", msg);
-    msg
-}
-
 pub async fn restore_window_state(app: &AppHandle) -> Result<(), String> {
-    // Try to restore from store plugin file if present; otherwise keep center.
-    // Position is primarily managed by frontend via store, but we also apply
-    // always-on-top here for cold start edge case.
     if let Some(win) = app.get_webview_window("pet") {
         let state = app.state::<SettingsState>();
         let s = state.0.lock().unwrap().clone();
         let _ = win.set_always_on_top(s.always_on_top);
         if let Some(pos) = s.pos {
-            // clamp to visible monitor union to handle monitor changes
             let monitors = win.available_monitors().map_err(|e| e.to_string())?;
             if !monitors.is_empty() {
                 let mut min_x = i32::MAX; let mut min_y = i32::MAX;
@@ -170,12 +159,25 @@ pub async fn restore_window_state(app: &AppHandle) -> Result<(), String> {
                 let y = pos.y.clamp(min_y, max_y - win_sz.height as i32);
                 let _ = win.set_position(PhysicalPosition::new(x, y));
             }
+        } else {
+            let monitors = win.available_monitors().map_err(|e| e.to_string())?;
+            if !monitors.is_empty() {
+                let mut min_x = i32::MAX; let mut min_y = i32::MAX;
+                let mut max_x = i32::MIN; let mut max_y = i32::MIN;
+                for m in &monitors {
+                    let p = m.position(); let sz = m.size();
+                    min_x = min_x.min(p.x); min_y = min_y.min(p.y);
+                    max_x = max_x.max(p.x + sz.width as i32);
+                    max_y = max_y.max(p.y + sz.height as i32);
+                }
+                let width = (max_x - min_x) as u32;
+                let height = (max_y - min_y) as u32;
+                let _ = win.set_position(PhysicalPosition::new(min_x, min_y));
+                let _ = win.set_size(PhysicalSize::new(width, height));
+            }
         }
-        // Ensure size matches pet_size
-        let base: u32 = 160;
-        let scale = s.pet_size.clamp(0.5, 2.5);
-        let sz = (base as f64 * scale) as u32;
-        let _ = win.set_size(PhysicalSize::new(sz, sz));
+        let _ = win.set_decorations(false);
+        let _ = win.set_shadow(false);
     }
     Ok(())
 }

@@ -3,7 +3,7 @@ mod tray;
 mod settings;
 
 use settings::SettingsState;
-use tauri::WindowEvent;
+use tauri::{Manager, PhysicalPosition, PhysicalSize, WindowEvent};
 
 fn main() {
     tauri::Builder::default()
@@ -22,22 +22,45 @@ fn main() {
             settings::open_settings,
             settings::quit_app,
             settings::set_always_on_top,
-            settings::debug_log,
         ])
         .setup(|app| {
             // Restore window position from settings if available
             let handle = app.handle().clone();
             tauri::async_runtime::spawn(async move {
-                // small delay to let windows be created
                 tokio::time::sleep(std::time::Duration::from_millis(200)).await;
                 let _ = settings::restore_window_state(&handle).await;
             });
 
+            // Make pet window cover the entire desktop (union of all monitors) for full roaming
+            {
+                let handle = app.handle().clone();
+                tauri::async_runtime::spawn(async move {
+                    tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+                    if let Some(win) = handle.get_webview_window("pet") {
+                        let _ = win.set_decorations(false);
+                        let _ = win.set_shadow(false);
+                        if let Ok(monitors) = win.available_monitors() {
+                            if !monitors.is_empty() {
+                                let mut min_x = i32::MAX; let mut min_y = i32::MAX;
+                                let mut max_x = i32::MIN; let mut max_y = i32::MIN;
+                                for m in &monitors {
+                                    let p = m.position();
+                                    let sz = *m.size();
+                                    min_x = min_x.min(p.x); min_y = min_y.min(p.y);
+                                    max_x = max_x.max(p.x + sz.width as i32);
+                                    max_y = max_y.max(p.y + sz.height as i32);
+                                }
+                                let width = (max_x - min_x) as u32;
+                                let height = (max_y - min_y) as u32;
+                                let _ = win.set_position(PhysicalPosition::new(min_x, min_y));
+                                let _ = win.set_size(PhysicalSize::new(width, height));
+                            }
+                        }
+                    }
+                });
+            }
+
             tray::create_tray(app.handle())?;
-
-            // macOS: hide dock icon until needed? Keep visible but skipTaskbar is true for pet window.
-            // Apply platform tweaks for transparent click-through handling is done in JS.
-
             Ok(())
         })
         .on_window_event(|window, event| {

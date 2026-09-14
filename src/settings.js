@@ -37,6 +37,7 @@ const els = {
   autostart: document.getElementById("autostart"),
   alwaysOnTop: document.getElementById("alwaysOnTop"),
   sound: document.getElementById("sound"),
+  petType: document.getElementById("petType"),
   petSize: document.getElementById("petSize"),
   petSizeVal: document.getElementById("petSizeVal"),
   animSpeed: document.getElementById("animSpeed"),
@@ -58,6 +59,7 @@ let settings = {
   walk_interval: "auto",
   alwaysOnTop: true,
   sound: false,
+  petType: "kitten",
 };
 
 async function load() {
@@ -71,6 +73,7 @@ async function load() {
   try { const s = await invoke("get_settings"); if (s) settings = { ...settings, ...s }; } catch {}
   try { settings.autostart = await isEnabled(); } catch {}
 
+  els.petType.value = settings.petType || "kitten";
   els.petSize.value = String(settings.petSize);
   els.animSpeed.value = String(settings.animSpeed);
   els.walkFreq.value = String(settings.walkFreq);
@@ -92,6 +95,7 @@ async function save() {
   settings.animSpeed = parseFloat(els.animSpeed.value);
   settings.walkFreq = parseFloat(els.walkFreq.value);
   settings.walk_interval = els.walkInterval ? els.walkInterval.value : settings.walk_interval;
+  settings.petType = els.petType ? els.petType.value : settings.petType;
   settings.alwaysOnTop = els.alwaysOnTop.checked;
   settings.sound = els.sound.checked;
 
@@ -115,6 +119,7 @@ if (els.walkInterval) els.walkInterval.addEventListener("change", save);
 els.alwaysOnTop.addEventListener("change", save);
 els.sound.addEventListener("change", save);
 els.autostart.addEventListener("change", save);
+if (els.petType) els.petType.addEventListener("change", async () => { settings.petType = els.petType.value; await save(); });
 if (els.sitStill) els.sitStill.addEventListener("click", async () => {
   await emit("sit-still", {}).catch(()=>{});
   try { await invoke("set_always_on_top", { enabled: settings.alwaysOnTop }); } catch {}
