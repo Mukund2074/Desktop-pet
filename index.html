@@ -3,483 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cute Desktop Pets - Animated SVG Companions</title>
+    <title>Desktop Pet</title>
     <style>
-        :root {
-            --ui-bg: rgba(255, 255, 255, 0.85);
-            --ui-border: rgba(200, 210, 230, 0.6);
-            --ui-text: #4a5568;
-            --ui-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        :root { --ui-text: #4a5568; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; height: 100%; overflow: hidden;
+            background: transparent !important;
+            background-color: rgba(0,0,0,0) !important;
+            font-family: system-ui, -apple-system, sans-serif;
+            user-select: none; -webkit-user-select: none;
         }
-
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            user-select: none;
-        }
-
+        [data-tauri-drag-region] { -webkit-app-region: drag; app-region: drag; }
         #desktop-viewport {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+            position: relative; width: 100%; height: 100%; overflow: hidden;
+            -webkit-app-region: no-drag; app-region: no-drag;
         }
-
         .pet-wrapper {
-            position: absolute;
-            width: 130px;
-            height: 130px;
-            cursor: grab;
-            will-change: transform, left, top;
-            filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.12));
+            position: absolute; width: 130px; height: 130px;
+            cursor: grab; will-change: left, top, transform;
+            filter: drop-shadow(0 12px 16px rgba(0,0,0,0.18));
             z-index: 10;
-            transition: filter 0.2s ease;
+            -webkit-app-region: no-drag; app-region: no-drag;
         }
-
-        .pet-wrapper:active {
-            cursor: grabbing;
-        }
-
-        .pet-wrapper.dragging {
-            filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.2));
-            z-index: 1000 !important;
-        }
-
-        .pet-svg {
-            width: 100%;
-            height: 100%;
-            overflow: visible;
-        }
-
-        .particle-container {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .floating-particle {
-            position: absolute;
-            font-size: 18px;
-            animation: floatUp 1s ease-out forwards;
-            opacity: 0;
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(0px) scale(0.5); opacity: 1; }
-            100% { transform: translateY(-40px) scale(1.2); opacity: 0; }
-        }
-
-        .pet-speech {
-            position: absolute;
-            top: -35px;
-            left: 50%;
-            transform: translateX(-50%) scale(0);
-            background: white;
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--ui-text);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            white-space: nowrap;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none;
-            border: 2px solid #edf2f7;
-        }
-
-        .pet-speech::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 5px 5px 0;
-            border-style: solid;
-            border-color: white transparent;
-            display: block;
-            width: 0;
-        }
-
-        .pet-wrapper:hover .pet-speech {
-            transform: translateX(-50%) scale(1);
-        }
-
-        #control-panel {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--ui-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--ui-border);
-            padding: 12px 20px;
-            border-radius: 20px;
-            box-shadow: var(--ui-shadow);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            z-index: 9999;
-            font-size: 13px;
-            color: var(--ui-text);
-        }
-
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        #control-panel select, #control-panel button {
-            background: white;
-            border: 1px solid var(--ui-border);
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--ui-text);
-            cursor: pointer;
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        #control-panel select:hover, #control-panel button:hover {
-            border-color: #cbd5e1;
-            background: #f8fafc;
-        }
-
-        #control-panel button:active {
-            transform: scale(0.96);
-        }
-
-        #control-panel input[type="range"] {
-            accent-color: #6366f1;
-            cursor: pointer;
-        }
-
-        .divider {
-            width: 1px;
-            height: 24px;
-            background: var(--ui-border);
-        }
+        .pet-wrapper:active { cursor: grabbing; }
+        .pet-wrapper.dragging { filter: drop-shadow(0 20px 25px rgba(0,0,0,0.25)); z-index: 1000 !important; }
+        .pet-svg { width: 100%; height: 100%; overflow: visible; }
+        .particle-container { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); pointer-events: none; display: flex; flex-direction: column; align-items: center; z-index: 100; }
+        .floating-particle { position: absolute; font-size: 18px; animation: floatUp 1s ease-out forwards; opacity: 0; }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-40px) scale(1.2); opacity: 0; } }
+        .pet-speech { position: absolute; top: -35px; left: 50%; transform: translateX(-50%) scale(0); background: white; padding: 5px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; color: var(--ui-text); box-shadow: 0 4px 12px rgba(0,0,0,0.1); white-space: nowrap; transition: transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275); pointer-events: none; border: 2px solid #edf2f7; }
+        .pet-speech::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border-width: 5px 5px 0; border-style: solid; border-color: white transparent; display: block; width: 0; }
+        .pet-wrapper:hover .pet-speech { transform: translateX(-50%) scale(1); }
+        /* context menu - the only settings entry on pet window */
+        #ctx-menu { position: fixed; min-width: 180px; background: rgba(255,255,255,0.97); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.18); padding: 6px; z-index: 9999; -webkit-app-region: no-drag; app-region: no-drag; }
+        #ctx-menu.hidden { display: none; }
+        #ctx-menu button { display: block; width: 100%; text-align: left; background: transparent; border: none; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #222; -webkit-app-region: no-drag; }
+        #ctx-menu button:hover { background: #f1f5f9; }
+        #ctx-menu .sep { height: 1px; background: #e2e8f0; margin: 4px 2px; }
     </style>
 </head>
 <body>
-
     <div id="desktop-viewport"></div>
 
-    <div id="control-panel">
-        <div class="control-group">
-            <label for="pet-select"><strong>Pet:</strong></label>
-            <select id="pet-select">
-                <option value="kitten">Kitten</option>
-                <option value="puppy">Puppy</option>
-                <option value="bunny">Bunny</option>
-                <option value="hamster">Hamster</option>
-                <option value="bear">Bear</option>
-            </select>
-        </div>
-
-        <div class="control-group">
-            <label for="anim-select"><strong>State:</strong></label>
-            <select id="anim-select">
-                <option value="idle">Idle</option>
-                <option value="walk">Walk</option>
-                <option value="sit">Sit</option>
-                <option value="love">Love / Pat</option>
-                <option value="angry">Angry</option>
-                <option value="sleep">Sleep</option>
-            </select>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="control-group">
-            <label for="speed-slider">Speed:</label>
-            <input type="range" id="speed-slider" min="0.5" max="2.5" step="0.1" value="1">
-        </div>
-
-        <div class="divider"></div>
-
-        <button id="spawn-btn">Spawn All 5</button>
-        <button id="reset-btn">Reset Layout</button>
+    <div id="ctx-menu" class="hidden" role="menu">
+        <button data-action="settings" role="menuitem">⚙️ Settings…</button>
+        <div class="sep"></div>
+        <button data-action="hide" role="menuitem">👁 Hide pets</button>
+        <button data-action="quit" role="menuitem">✕ Quit</button>
     </div>
 
-    <script>
+    <script type="module">
+        // keep original 5 pet templates exactly as provided
         const PET_TEMPLATES = {
-            kitten: {
-                name: "Mochi",
-                speech: "Meow~ 🐾",
-                svg: `<svg class="pet-svg" viewBox="0 0 120 120"><g class="pet-root" transform="translate(60, 60)"><g class="limb-tail" transform="translate(32, 10)"><path d="M 0 0 Q 22 -15 15 -35 Q 12 -42 20 -40" fill="none" stroke="#f8fafc" stroke-width="8" stroke-linecap="round"/></g><g class="limb-leg-back" transform="translate(18, 20)"><rect x="-6" y="0" width="12" height="24" rx="6" fill="#f1f5f9"/><ellipse cx="0" cy="22" rx="6" ry="4" fill="#e2e8f0"/></g><g class="body-group"><ellipse cx="0" cy="14" rx="26" ry="22" fill="#ffffff"/></g><g class="limb-leg-front" transform="translate(-14, 20)"><rect x="-5" y="0" width="10" height="24" rx="5" fill="#ffffff"/><ellipse cx="0" cy="22" rx="5" ry="3.5" fill="#f1f5f9"/></g><g class="head-group" transform="translate(2, -14)"><circle cx="0" cy="0" r="26" fill="#ffffff"/><polygon points="-22,-16 -28,-36 -8,-24" fill="#ffffff"/><polygon points="-20,-18 -25,-32 -11,-22" fill="#fbcfe8"/><polygon points="22,-16 28,-36 8,-24" fill="#ffffff"/><polygon points="20,-18 25,-32 11,-22" fill="#fbcfe8"/><g class="face-expr"><circle cx="-9" cy="-3" r="3" fill="#1e293b" class="eye-shape"/><circle cx="9" cy="-3" r="3" fill="#1e293b" class="eye-shape"/><circle cx="-10" cy="-4" r="1" fill="#fff"/><circle cx="8" cy="-4" r="1" fill="#fff"/><polygon points="0,2 -3,0 3,0" fill="#f472b6"/><path d="M -3 4 Q 0 7 3 4" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round" class="mouth-shape"/><circle cx="-16" cy="2" r="4.5" fill="#fbcfe8" opacity="0.6"/><circle cx="16" cy="2" r="4.5" fill="#fbcfe8" opacity="0.6"/></g></g><g class="limb-arm-left" transform="translate(-16, 2)"><rect x="-4" y="0" width="8" height="18" rx="4" fill="#ffffff" transform="rotate(15)"/></g><g class="limb-arm-right" transform="translate(16, 2)"><rect x="-4" y="0" width="8" height="18" rx="4" fill="#ffffff" transform="rotate(-15)"/></g></g></svg>`
-            },
-            puppy: {
-                name: "Biscuit",
-                speech: "Woof! 🦴",
-                svg: `<svg class="pet-svg" viewBox="0 0 120 120"><g class="pet-root" transform="translate(60, 60)"><g class="limb-tail" transform="translate(30, 8)"><path d="M 0 0 Q 18 -12 25 -25" fill="none" stroke="#f8fafc" stroke-width="7" stroke-linecap="round"/></g><g class="limb-leg-back" transform="translate(16, 22)"><rect x="-6" y="0" width="12" height="22" rx="6" fill="#f1f5f9"/><ellipse cx="0" cy="20" rx="6" ry="4" fill="#e2e8f0"/></g><g class="body-group"><ellipse cx="0" cy="15" rx="28" ry="21" fill="#ffffff"/><circle cx="-12" cy="18" r="6" fill="#fbcfe8" opacity="0.3"/></g><g class="limb-leg-front" transform="translate(-14, 22)"><rect x="-5" y="0" width="10" height="22" rx="5" fill="#ffffff"/><ellipse cx="0" cy="20" rx="5" ry="3.5" fill="#f1f5f9"/></g><g class="head-group" transform="translate(0, -12)"><circle cx="0" cy="0" r="27" fill="#ffffff"/><path d="M -22 -10 Q -38 5 -24 22 Z" fill="#ffffff"/><path d="M 22 -10 Q 38 5 24 22 Z" fill="#ffffff"/><g class="face-expr"><circle cx="-9" cy="-4" r="3" fill="#1e293b" class="eye-shape"/><circle cx="9" cy="-4" r="3" fill="#1e293b" class="eye-shape"/><circle cx="-10" cy="-5" r="1" fill="#fff"/><circle cx="8" cy="-5" r="1" fill="#fff"/><ellipse cx="0" cy="1" rx="4" ry="3" fill="#1e293b"/><path d="M -4 6 Q 0 11 4 6" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round" class="mouth-shape"/><path d="M -2 9 Q 0 14 2 9 Z" fill="#f472b6" class="tongue-shape"/></g></g><g class="limb-arm-left" transform="translate(-18, 4)"><rect x="-4" y="0" width="8" height="16" rx="4" fill="#ffffff" transform="rotate(20)"/></g><g class="limb-arm-right" transform="translate(18, 4)"><rect x="-4" y="0" width="8" height="16" rx="4" fill="#ffffff" transform="rotate(-20)"/></g></g></svg>`
-            },
-            bunny: {
-                name: "Cotton",
-                speech: "Hop! 🥕",
-                svg: `<svg class="pet-svg" viewBox="0 0 120 120"><g class="pet-root" transform="translate(60, 60)"><g class="head-group" transform="translate(0, -16)"><ellipse cx="-10" cy="-30" rx="6" ry="20" fill="#ffffff" transform="rotate(-10 -10 -30)" class="left-ear"/><ellipse cx="-10" cy="-30" rx="3" ry="14" fill="#fbcfe8" transform="rotate(-10 -10 -30)"/><ellipse cx="10" cy="-30" rx="6" ry="20" fill="#ffffff" transform="rotate(10 10 -30)" class="right-ear"/><ellipse cx="10" cy="-30" rx="3" ry="14" fill="#fbcfe8" transform="rotate(10 10 -30)"/><circle cx="0" cy="0" r="25" fill="#ffffff"/><g class="face-expr"><circle cx="-8" cy="-3" r="2.5" fill="#1e293b" class="eye-shape"/><circle cx="8" cy="-3" r="2.5" fill="#1e293b" class="eye-shape"/><polygon points="0,2 -2.5,-0.5 2.5,-0.5" fill="#f472b6"/><path d="M -2.5 2 Q 0 5 2.5 2" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round"/><circle cx="-14" cy="2" r="4" fill="#fbcfe8" opacity="0.6"/><circle cx="14" cy="2" r="4" fill="#fbcfe8" opacity="0.6"/></g></g><g class="limb-leg-back" transform="translate(18, 22)"><ellipse cx="0" cy="6" rx="8" ry="12" fill="#f1f5f9" transform="rotate(20)"/></g><g class="body-group"><ellipse cx="0" cy="18" rx="24" ry="20" fill="#ffffff"/><circle cx="26" cy="16" r="6" fill="#ffffff"/></g><g class="limb-leg-front" transform="translate(-12, 24)"><rect x="-4" y="0" width="8" height="18" rx="4" fill="#ffffff"/></g><g class="limb-arm-left" transform="translate(-15, 8)"><rect x="-3" y="0" width="6" height="14" rx="3" fill="#ffffff" transform="rotate(30)"/></g><g class="limb-arm-right" transform="translate(15, 8)"><rect x="-3" y="0" width="6" height="14" rx="3" fill="#ffffff" transform="rotate(-30)"/></g></g></svg>`
-            },
-            hamster: {
-                name: "Pip",
-                speech: "Squeak! 🌻",
-                svg: `<svg class="pet-svg" viewBox="0 0 120 120"><g class="pet-root" transform="translate(60, 60)"><g class="limb-leg-back" transform="translate(14, 26)"><ellipse cx="0" cy="4" rx="7" ry="5" fill="#e2e8f0"/></g><g class="body-group"><ellipse cx="0" cy="16" rx="30" ry="24" fill="#ffffff"/><path d="M -26 10 Q -32 20 -24 28" fill="#fef08a" stroke="#fde047" stroke-width="2"/><path d="M 26 10 Q 32 20 24 28" fill="#fef08a" stroke="#fde047" stroke-width="2"/></g><g class="limb-leg-front" transform="translate(-12, 26)"><ellipse cx="0" cy="4" rx="6" ry="5" fill="#f1f5f9"/></g><g class="head-group" transform="translate(0, -6)"><circle cx="-18" cy="-14" r="8" fill="#ffffff"/><circle cx="-18" cy="-14" r="4" fill="#fbcfe8"/><circle cx="18" cy="-14" r="8" fill="#ffffff"/><circle cx="18" cy="-14" r="4" fill="#fbcfe8"/><ellipse cx="0" cy="-2" rx="28" ry="24" fill="#ffffff"/><g class="face-expr"><circle cx="-10" cy="-5" r="3" fill="#1e293b" class="eye-shape"/><circle cx="10" cy="-5" r="3" fill="#1e293b" class="eye-shape"/><circle cx="-11" cy="-6" r="1" fill="#fff"/><circle cx="9" cy="-6" r="1" fill="#fff"/><polygon points="0,0 -2.5,-2.5 2.5,-2.5" fill="#f472b6"/><path d="M -2 2 Q 0 5 2 2" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/><circle cx="-17" cy="1" r="5" fill="#fbcfe8" opacity="0.6"/><circle cx="17" cy="1" r="5" fill="#fbcfe8" opacity="0.6"/></g></g><g class="limb-arm-left" transform="translate(-18, 12)"><rect x="-3" y="0" width="6" height="12" rx="3" fill="#ffffff" transform="rotate(45)"/></g><g class="limb-arm-right" transform="translate(18, 12)"><rect x="-3" y="0" width="6" height="12" rx="3" fill="#ffffff" transform="rotate(-45)"/></g></g></svg>`
-            },
-            bear: {
-                name: "Snowball",
-                speech: "Grr... (Cute) ❄️",
-                svg: `<svg class="pet-svg" viewBox="0 0 120 120"><g class="pet-root" transform="translate(60, 60)"><g class="limb-leg-back" transform="translate(18, 22)"><rect x="-7" y="0" width="14" height="22" rx="7" fill="#f1f5f9"/><ellipse cx="0" cy="20" rx="7" ry="4" fill="#e2e8f0"/></g><g class="body-group"><ellipse cx="0" cy="16" rx="30" ry="24" fill="#ffffff"/></g><g class="limb-leg-front" transform="translate(-16, 22)"><rect x="-6" y="0" width="12" height="22" rx="6" fill="#ffffff"/><ellipse cx="0" cy="20" rx="6" ry="4" fill="#f1f5f9"/></g><g class="head-group" transform="translate(0, -12)"><circle cx="-20" cy="-18" r="9" fill="#ffffff"/><circle cx="-20" cy="-18" r="4.5" fill="#fbcfe8"/><circle cx="20" cy="-18" r="9" fill="#ffffff"/><circle cx="20" cy="-18" r="4.5" fill="#fbcfe8"/><circle cx="0" cy="0" r="28" fill="#ffffff"/><g class="face-expr"><circle cx="-10" cy="-4" r="3" fill="#1e293b" class="eye-shape"/><circle cx="10" cy="-4" r="3" fill="#1e293b" class="eye-shape"/><circle cx="-11" cy="-5" r="1" fill="#fff"/><circle cx="9" cy="-5" r="1" fill="#fff"/><ellipse cx="0" cy="2" rx="7" ry="5" fill="#f8fafc"/><ellipse cx="0" cy="1" rx="3.5" ry="2.5" fill="#1e293b"/><path d="M -3 6 Q 0 9 3 6" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round" class="mouth-shape"/></g></g><g class="limb-arm-left" transform="translate(-20, 6)"><rect x="-5" y="0" width="10" height="16" rx="5" fill="#ffffff" transform="rotate(20)"/></g><g class="limb-arm-right" transform="translate(20, 6)"><rect x="-5" y="0" width="10" height="16" rx="5" fill="#ffffff" transform="rotate(-20)"/></g></g></svg>`
-            }
+            kitten: { name: "Mochi", speech: "Meow~ 🐾", svg: `<svg class="pet-svg" viewBox="0 0 120 120"><g class="pet-root" transform="translate(60, 60)"><g class="limb-tail" transform="translate(32, 10)"><path d="M 0 0 Q 22 -15 15 -35 Q 12 -42 20 -40" fill="none" stroke="#f8fafc" stroke-width="8" stroke-linecap="round"/></g><g class="limb-leg-back" transform="translate(18, 20)"><rect x="-6" y="0" width="12" height="24" rx="6" fill="#f1f5f9"/><ellipse cx="0" cy="22" rx="6" ry="4" fill="#e2e8f0"/></g><g class="body-group"><ellipse cx="0" cy="14" rx="26" ry="22" fill="#ffffff"/></g><g class="limb-leg-front" transform="translate(-14, 20)"><rect x="-5" y="0" width="10" height="24" rx="5" fill="#ffffff"/><ellipse cx="0" cy="22" rx="5" ry="3.5" fill="#f1f5f9"/></g><g class="head-group" transform="translate(2, -14)"><circle cx="0" cy="0" r="26" fill="#ffffff"/><polygon points="-22,-16 -28,-36 -8,-24" fill="#ffffff"/><polygon points="-20,-18 -25,-32 -11,-22" fill="#fbcfe8"/><polygon points="22,-16 28,-36 8,-24" fill="#ffffff"/><polygon points="20,-18 25,-32 11,-22" fill="#fbcfe8"/><g class="face-expr"><circle cx="-9" cy="-3" r="3" fill="#1e293b" class="eye-shape"/><circle cx="9" cy="-3" r="3" fill="#1e293b" class="eye-shape"/><circle cx="-10" cy="-4" r="1" fill="#fff"/><circle cx="8" cy="-4" r="1" fill="#fff"/><polygon points="0,2 -3,0 3,0" fill="#f472b6"/><path d="M -3 4 Q 0 7 3 4" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round" class="mouth-shape"/><circle cx="-16" cy="2" r="4.5" fill="#fbcfe8" opacity="0.6"/><circle cx="16" cy="2" r="4.5" fill="#fbcfe8" opacity="0.6"/></g></g><g class="limb-arm-left" transform="translate(-16, 2)"><rect x="-4" y="0" width="8" height="18" rx="4" fill="#ffffff" transform="rotate(15)"/></g><g class="limb-arm-right" transform="translate(16, 2)"><rect x="-4" y="0" width="8" height="18" rx="4" fill="#ffffff" transform="rotate(-15)"/></g></g></svg>` },
+            puppy: { name: "Biscuit", speech: "Woof! 🦴", svg: `<svg class="pet-svg" viewBox="0 0 120 120"><g class="pet-root" transform="translate(60, 60)"><g class="limb-tail" transform="translate(30, 8)"><path d="M 0 0 Q 18 -12 25 -25" fill="none" stroke="#f8fafc" stroke-width="7" stroke-linecap="round"/></g><g class="limb-leg-back" transform="translate(16, 22)"><rect x="-6" y="0" width="12" height="22" rx="6" fill="#f1f5f9"/><ellipse cx="0" cy="20" rx="6" ry="4" fill="#e2e8f0"/></g><g class="body-group"><ellipse cx="0" cy="15" rx="28" ry="21" fill="#ffffff"/><circle cx="-12" cy="18" r="6" fill="#fbcfe8" opacity="0.3"/></g><g class="limb-leg-front" transform="translate(-14, 22)"><rect x="-5" y="0" width="10" height="22" rx="5" fill="#ffffff"/><ellipse cx="0" cy="20" rx="5" ry="3.5" fill="#f1f5f9"/></g><g class="head-group" transform="translate(0, -12)"><circle cx="0" cy="0" r="27" fill="#ffffff"/><path d="M -22 -10 Q -38 5 -24 22 Z" fill="#ffffff"/><path d="M 22 -10 Q 38 5 24 22 Z" fill="#ffffff"/><g class="face-expr"><circle cx="-9" cy="-4" r="3" fill="#1e293b" class="eye-shape"/><circle cx="9" cy="-4" r="3" fill="#1e293b" class="eye-shape"/><circle cx="-10" cy="-5" r="1" fill="#fff"/><circle cx="8" cy="-5" r="1" fill="#fff"/><ellipse cx="0" cy="1" rx="4" ry="3" fill="#1e293b"/><path d="M -4 6 Q 0 11 4 6" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round" class="mouth-shape"/><path d="M -2 9 Q 0 14 2 9 Z" fill="#f472b6" class="tongue-shape"/></g></g><g class="limb-arm-left" transform="translate(-18, 4)"><rect x="-4" y="0" width="8" height="16" rx="4" fill="#ffffff" transform="rotate(20)"/></g><g class="limb-arm-right" transform="translate(18, 4)"><rect x="-4" y="0" width="8" height="16" rx="4" fill="#ffffff" transform="rotate(-20)"/></g></g></svg>` },
+            bunny: { name: "Cotton", speech: "Hop! 🥕", svg: `<svg class="pet-svg" viewBox="0 0 120 120"><g class="pet-root" transform="translate(60, 60)"><g class="head-group" transform="translate(0, -16)"><ellipse cx="-10" cy="-30" rx="6" ry="20" fill="#ffffff" transform="rotate(-10 -10 -30)" class="left-ear"/><ellipse cx="-10" cy="-30" rx="3" ry="14" fill="#fbcfe8" transform="rotate(-10 -10 -30)"/><ellipse cx="10" cy="-30" rx="6" ry="20" fill="#ffffff" transform="rotate(10 10 -30)" class="right-ear"/><ellipse cx="10" cy="-30" rx="3" ry="14" fill="#fbcfe8" transform="rotate(10 10 -30)"/><circle cx="0" cy="0" r="25" fill="#ffffff"/><g class="face-expr"><circle cx="-8" cy="-3" r="2.5" fill="#1e293b" class="eye-shape"/><circle cx="8" cy="-3" r="2.5" fill="#1e293b" class="eye-shape"/><polygon points="0,2 -2.5,-0.5 2.5,-0.5" fill="#f472b6"/><path d="M -2.5 2 Q 0 5 2.5 2" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round"/><circle cx="-14" cy="2" r="4" fill="#fbcfe8" opacity="0.6"/><circle cx="14" cy="2" r="4" fill="#fbcfe8" opacity="0.6"/></g></g><g class="limb-leg-back" transform="translate(18, 22)"><ellipse cx="0" cy="6" rx="8" ry="12" fill="#f1f5f9" transform="rotate(20)"/></g><g class="body-group"><ellipse cx="0" cy="18" rx="24" ry="20" fill="#ffffff"/><circle cx="26" cy="16" r="6" fill="#ffffff"/></g><g class="limb-leg-front" transform="translate(-12, 24)"><rect x="-4" y="0" width="8" height="18" rx="4" fill="#ffffff"/></g><g class="limb-arm-left" transform="translate(-15, 8)"><rect x="-3" y="0" width="6" height="14" rx="3" fill="#ffffff" transform="rotate(30)"/></g><g class="limb-arm-right" transform="translate(15, 8)"><rect x="-3" y="0" width="6" height="14" rx="3" fill="#ffffff" transform="rotate(-30)"/></g></g></svg>` },
+            hamster: { name: "Pip", speech: "Squeak! 🌻", svg: `<svg class="pet-svg" viewBox="0 0 120 120"><g class="pet-root" transform="translate(60, 60)"><g class="limb-leg-back" transform="translate(14, 26)"><ellipse cx="0" cy="4" rx="7" ry="5" fill="#e2e8f0"/></g><g class="body-group"><ellipse cx="0" cy="16" rx="30" ry="24" fill="#ffffff"/><path d="M -26 10 Q -32 20 -24 28" fill="#fef08a" stroke="#fde047" stroke-width="2"/><path d="M 26 10 Q 32 20 24 28" fill="#fef08a" stroke="#fde047" stroke-width="2"/></g><g class="limb-leg-front" transform="translate(-12, 26)"><ellipse cx="0" cy="4" rx="6" ry="5" fill="#f1f5f9"/></g><g class="head-group" transform="translate(0, -6)"><circle cx="-18" cy="-14" r="8" fill="#ffffff"/><circle cx="-18" cy="-14" r="4" fill="#fbcfe8"/><circle cx="18" cy="-14" r="8" fill="#ffffff"/><circle cx="18" cy="-14" r="4" fill="#fbcfe8"/><ellipse cx="0" cy="-2" rx="28" ry="24" fill="#ffffff"/><g class="face-expr"><circle cx="-10" cy="-5" r="3" fill="#1e293b" class="eye-shape"/><circle cx="10" cy="-5" r="3" fill="#1e293b" class="eye-shape"/><circle cx="-11" cy="-6" r="1" fill="#fff"/><circle cx="9" cy="-6" r="1" fill="#fff"/><polygon points="0,0 -2.5,-2.5 2.5,-2.5" fill="#f472b6"/><path d="M -2 2 Q 0 5 2 2" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/><circle cx="-17" cy="1" r="5" fill="#fbcfe8" opacity="0.6"/><circle cx="17" cy="1" r="5" fill="#fbcfe8" opacity="0.6"/></g></g><g class="limb-arm-left" transform="translate(-18, 12)"><rect x="-3" y="0" width="6" height="12" rx="3" fill="#ffffff" transform="rotate(45)"/></g><g class="limb-arm-right" transform="translate(18, 12)"><rect x="-3" y="0" width="6" height="12" rx="3" fill="#ffffff" transform="rotate(-45)"/></g></g></svg>` },
+            bear: { name: "Snowball", speech: "Grr... (Cute) ❄️", svg: `<svg class="pet-svg" viewBox="0 0 120 120"><g class="pet-root" transform="translate(60, 60)"><g class="limb-leg-back" transform="translate(18, 22)"><rect x="-7" y="0" width="14" height="22" rx="7" fill="#f1f5f9"/><ellipse cx="0" cy="20" rx="7" ry="4" fill="#e2e8f0"/></g><g class="body-group"><ellipse cx="0" cy="16" rx="30" ry="24" fill="#ffffff"/></g><g class="limb-leg-front" transform="translate(-16, 22)"><rect x="-6" y="0" width="12" height="22" rx="6" fill="#ffffff"/><ellipse cx="0" cy="20" rx="6" ry="4" fill="#f1f5f9"/></g><g class="head-group" transform="translate(0, -12)"><circle cx="-20" cy="-18" r="9" fill="#ffffff"/><circle cx="-20" cy="-18" r="4.5" fill="#fbcfe8"/><circle cx="20" cy="-18" r="9" fill="#ffffff"/><circle cx="20" cy="-18" r="4.5" fill="#fbcfe8"/><circle cx="0" cy="0" r="28" fill="#ffffff"/><g class="face-expr"><circle cx="-10" cy="-4" r="3" fill="#1e293b" class="eye-shape"/><circle cx="10" cy="-4" r="3" fill="#1e293b" class="eye-shape"/><circle cx="-11" cy="-5" r="1" fill="#fff"/><circle cx="9" cy="-5" r="1" fill="#fff"/><ellipse cx="0" cy="2" rx="7" ry="5" fill="#f8fafc"/><ellipse cx="0" cy="1" rx="3.5" ry="2.5" fill="#1e293b"/><path d="M -3 6 Q 0 9 3 6" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round" class="mouth-shape"/></g></g><g class="limb-arm-left" transform="translate(-20, 6)"><rect x="-5" y="0" width="10" height="16" rx="5" fill="#ffffff" transform="rotate(20)"/></g><g class="limb-arm-right" transform="translate(20, 6)"><rect x="-5" y="0" width="10" height="16" rx="5" fill="#ffffff" transform="rotate(-20)"/></g></g></svg>` }
         };
+        const ALL_TYPES = ['kitten','puppy','bunny','hamster','bear'];
+
+        // --- Tauri store / event bridge (settings window controls pet count) ---
+        let store, invoke, listenFn, isTauri = false;
+        try {
+            const w = await import('@tauri-apps/api/window');
+            const c = await import('@tauri-apps/api/core');
+            const s = await import('@tauri-apps/plugin-store');
+            const e = await import('@tauri-apps/api/event');
+            invoke = c.invoke; listenFn = e.listen;
+            store = new s.LazyStore('settings.json');
+            isTauri = true;
+        } catch {}
+        if (!store) {
+            const P='desktop-pet:'; store={ get: async k=>{try{const v=localStorage.getItem(P+k);return v?JSON.parse(v):undefined;}catch{return undefined}}, set: async(k,v)=>{try{localStorage.setItem(P+k,JSON.stringify(v));}catch{}}, save: async()=>{} };
+            invoke = async()=>null; listenFn = async()=>()=>{};
+        }
+        const DEFAULTS = { petCount: 5, selectedPets: ALL_TYPES.slice(), speed: 1 };
+        let settings = { ...DEFAULTS };
+
+        async function loadSettings() {
+            for (const k of Object.keys(DEFAULTS)) { const v = await store.get(k).catch(()=>undefined); if (v!==undefined && v!==null) settings[k]=v; }
+            try { const s = await invoke('get_settings'); if (s) { if (s.pet_count!==undefined) settings.petCount=s.pet_count; if (s.selected_pets) settings.selectedPets=s.selected_pets; } } catch{}
+            if (!settings.selectedPets || !settings.selectedPets.length) settings.selectedPets = ALL_TYPES.slice(0, settings.petCount);
+            settings.petCount = Math.max(1, Math.min(5, settings.selectedPets.length || settings.petCount));
+        }
+        async function saveSettings() { for (const [k,v] of Object.entries(settings)) await store.set(k,v); await store.save().catch(()=>{}); try{await invoke('save_settings',{ settings:{ pet_count: settings.petCount, selected_pets: settings.selectedPets } });}catch{} }
 
         class DesktopPet {
             constructor(type, x, y) {
-                this.type = type;
-                this.template = PET_TEMPLATES[type];
-                this.x = x;
-                this.y = y;
-                this.vx = 0;
-                this.vy = 0;
-                this.speedMultiplier = 1;
-                this.state = 'idle';
-                this.facing = 1;
-                this.targetX = x;
-                this.targetY = y;
-                this.stateTimer = 0;
-                this.isDragging = false;
-                this.dragOffsetX = 0;
-                this.dragOffsetY = 0;
-                this.initDOM();
-                this.pickNewState();
+                this.type = type; this.template = PET_TEMPLATES[type];
+                this.x=x; this.y=y; this.vx=0; this.vy=0; this.speedMultiplier=1;
+                this.state='idle'; this.facing=1; this.targetX=x; this.targetY=y; this.stateTimer=0;
+                this.isDragging=false; this.dragOffsetX=0; this.dragOffsetY=0;
+                this.initDOM(); this.pickNewState();
             }
-
             initDOM() {
-                this.wrapper = document.createElement('div');
-                this.wrapper.className = 'pet-wrapper';
-                this.wrapper.innerHTML = `<div class="pet-speech">${this.template.speech}</div><div class="particle-container"></div>${this.template.svg}`;
-                this.rootGroup = this.wrapper.querySelector('.pet-root');
-                this.bodyGroup = this.wrapper.querySelector('.body-group');
-                this.headGroup = this.wrapper.querySelector('.head-group');
-                this.armLeft = this.wrapper.querySelector('.limb-arm-left');
-                this.armRight = this.wrapper.querySelector('.limb-arm-right');
-                this.legBack = this.wrapper.querySelector('.limb-leg-back');
-                this.legFront = this.wrapper.querySelector('.limb-leg-front');
-                this.tail = this.wrapper.querySelector('.limb-tail');
-                this.faceExpr = this.wrapper.querySelector('.face-expr');
-                this.particleContainer = this.wrapper.querySelector('.particle-container');
-                this.wrapper.addEventListener('mousedown', (e) => this.onMouseDown(e));
-                this.wrapper.addEventListener('contextmenu', (e) => { e.preventDefault(); this.triggerState('angry'); });
-                this.wrapper.addEventListener('dblclick', (e) => { e.stopPropagation(); this.triggerState('love'); });
-                document.getElementById('desktop-viewport').appendChild(this.wrapper);
-                this.updatePosition();
+                this.wrapper=document.createElement('div'); this.wrapper.className='pet-wrapper';
+                this.wrapper.innerHTML=`<div class="pet-speech">${this.template.speech}</div><div class="particle-container"></div>${this.template.svg}`;
+                this.rootGroup=this.wrapper.querySelector('.pet-root'); this.bodyGroup=this.wrapper.querySelector('.body-group');
+                this.headGroup=this.wrapper.querySelector('.head-group'); this.armLeft=this.wrapper.querySelector('.limb-arm-left');
+                this.armRight=this.wrapper.querySelector('.limb-arm-right'); this.legBack=this.wrapper.querySelector('.limb-leg-back');
+                this.legFront=this.wrapper.querySelector('.limb-leg-front'); this.tail=this.wrapper.querySelector('.limb-tail');
+                this.particleContainer=this.wrapper.querySelector('.particle-container');
+                this.wrapper.addEventListener('mousedown',e=>this.onMouseDown(e));
+                this.wrapper.addEventListener('contextmenu',e=>{e.preventDefault(); this.triggerState('angry');});
+                this.wrapper.addEventListener('dblclick',e=>{e.stopPropagation(); this.triggerState('love');});
+                document.getElementById('desktop-viewport').appendChild(this.wrapper); this.updatePosition();
             }
-
-            triggerState(newState) {
-                this.state = newState;
-                this.stateTimer = 150;
-                if (newState === 'love') this.spawnParticle('❤️');
-                if (newState === 'angry') this.spawnParticle('💢');
-                if (newState === 'sleep') this.spawnParticle('💤');
-            }
-
-            spawnParticle(symbol) {
-                const p = document.createElement('div');
-                p.className = 'floating-particle';
-                p.innerText = symbol;
-                this.particleContainer.appendChild(p);
-                setTimeout(() => p.remove(), 1000);
-            }
-
-            onMouseDown(e) {
-                if (e.button !== 0) return;
-                this.isDragging = true;
-                this.wrapper.classList.add('dragging');
-                this.dragOffsetX = e.clientX - this.x;
-                this.dragOffsetY = e.clientY - this.y;
-                this.triggerState('love');
-            }
-
-            onMouseMove(e) {
-                if (!this.isDragging) return;
-                this.x = e.clientX - this.dragOffsetX;
-                this.y = e.clientY - this.dragOffsetY;
-                this.clampToBounds();
-            }
-
-            onMouseUp() {
-                if (!this.isDragging) return;
-                this.isDragging = false;
-                this.wrapper.classList.remove('dragging');
-                this.vx = (Math.random() - 0.5) * 4;
-                this.vy = (Math.random() - 0.5) * 4;
-            }
-
-            clampToBounds() {
-                const maxX = window.innerWidth - 110;
-                const maxY = window.innerHeight - 110;
-                this.x = Math.max(10, Math.min(maxX, this.x));
-                this.y = Math.max(10, Math.min(maxY, this.y));
-            }
-
-            pickNewState() {
-                const rand = Math.random();
-                if (rand < 0.35) {
-                    this.state = 'idle';
-                    this.stateTimer = 120 + Math.random() * 150;
-                } else if (rand < 0.70) {
-                    this.state = 'walk';
-                    this.stateTimer = 180 + Math.random() * 250;
-                    const angle = Math.random() * Math.PI * 2;
-                    const dist = 100 + Math.random() * 250;
-                    this.targetX = this.x + Math.cos(angle) * dist;
-                    this.targetY = this.y + Math.sin(angle) * dist;
-                } else if (rand < 0.85) {
-                    this.state = 'sit';
-                    this.stateTimer = 150 + Math.random() * 200;
-                } else {
-                    this.state = 'sleep';
-                    this.stateTimer = 250 + Math.random() * 300;
-                    this.spawnParticle('💤');
+            triggerState(s){ this.state=s; this.stateTimer=150; if(s==='love')this.spawnParticle('❤️'); if(s==='angry')this.spawnParticle('💢'); if(s==='sleep')this.spawnParticle('💤'); }
+            spawnParticle(sym){ const p=document.createElement('div'); p.className='floating-particle'; p.innerText=sym; this.particleContainer.appendChild(p); setTimeout(()=>p.remove(),1000); }
+            onMouseDown(e){ if(e.button!==0)return; this.isDragging=true; this.wrapper.classList.add('dragging'); this.dragOffsetX=e.clientX-this.x; this.dragOffsetY=e.clientY-this.y; this.triggerState('love'); }
+            onMouseMove(e){ if(!this.isDragging)return; this.x=e.clientX-this.dragOffsetX; this.y=e.clientY-this.dragOffsetY; this.clampToBounds(); }
+            onMouseUp(){ if(!this.isDragging)return; this.isDragging=false; this.wrapper.classList.remove('dragging'); this.vx=(Math.random()-0.5)*4; this.vy=(Math.random()-0.5)*4; }
+            clampToBounds(){ const maxX=window.innerWidth-110, maxY=window.innerHeight-110; this.x=Math.max(10,Math.min(maxX,this.x)); this.y=Math.max(10,Math.min(maxY,this.y)); }
+            pickNewState(){ const r=Math.random(); if(r<0.35){this.state='idle'; this.stateTimer=120+Math.random()*150;} else if(r<0.70){this.state='walk'; this.stateTimer=180+Math.random()*250; const a=Math.random()*Math.PI*2, d=100+Math.random()*250; this.targetX=this.x+Math.cos(a)*d; this.targetY=this.y+Math.sin(a)*d;} else if(r<0.85){this.state='sit'; this.stateTimer=150+Math.random()*200;} else {this.state='sleep'; this.stateTimer=250+Math.random()*300; this.spawnParticle('💤');}}
+            update(gs){ this.speedMultiplier=gs; if(this.isDragging){this.updateTransformAnimation(0); this.updatePosition(); return;} this.stateTimer--; if(this.stateTimer<=0) this.pickNewState(); let t=Date.now()/100; if(this.state==='walk'){ const dx=this.targetX-this.x, dy=this.targetY-this.y, dist=Math.hypot(dx,dy); if(dist<15||this.x<=20||this.x>=window.innerWidth-120||this.y<=20||this.y>=window.innerHeight-120){ this.targetX=this.x+(Math.random()-0.5)*300; this.targetY=this.y+(Math.random()-0.5)*300; } const s=1.2*this.speedMultiplier; this.x+=(dx/dist)*s; this.y+=(dy/dist)*s; this.clampToBounds(); if(dx!==0) this.facing=dx>0?1:-1; } this.updateTransformAnimation(t); this.updatePosition(); }
+            updateTransformAnimation(t){
+                this.rootGroup.setAttribute('transform',`translate(60, 60) scale(${this.facing}, 1)`);
+                if(this.armLeft) this.armLeft.setAttribute('transform','translate(-16, 2)'); if(this.armRight) this.armRight.setAttribute('transform','translate(16, 2)');
+                if(this.legBack) this.legBack.setAttribute('transform','translate(16, 22)'); if(this.legFront) this.legFront.setAttribute('transform','translate(-14, 22)');
+                if(this.headGroup) this.headGroup.setAttribute('transform','translate(0, -12)'); if(this.bodyGroup) this.bodyGroup.setAttribute('transform','translate(0, 0)');
+                if(this.tail) this.tail.setAttribute('transform','translate(28, 10)');
+                let b=Math.sin(t*0.15)*1.5;
+                switch(this.state){
+                    case 'idle': if(this.bodyGroup) this.bodyGroup.setAttribute('transform',`translate(0, ${b}) scale(1, ${1+b*0.01})`); if(this.headGroup) this.headGroup.setAttribute('transform',`translate(0, ${-12+b*0.5})`); if(this.tail){let s=Math.sin(t*0.3)*8; this.tail.setAttribute('transform',`translate(28, 10) rotate(${s})`);} break;
+                    case 'walk': {let c=t*0.8*this.speedMultiplier, lb=Math.sin(c)*15, lf=Math.sin(c+Math.PI)*15, bb=Math.abs(Math.sin(c*2))*-4; if(this.bodyGroup) this.bodyGroup.setAttribute('transform',`translate(0, ${bb})`); if(this.headGroup) this.headGroup.setAttribute('transform',`translate(0, ${-12+bb*0.5})`); if(this.legBack) this.legBack.setAttribute('transform',`translate(16, 22) rotate(${lb})`); if(this.legFront) this.legFront.setAttribute('transform',`translate(-14, 22) rotate(${lf})`); if(this.armLeft) this.armLeft.setAttribute('transform',`translate(-16, 2) rotate(${-lb*0.8})`); if(this.armRight) this.armRight.setAttribute('transform',`translate(16, 2) rotate(${-lf*0.8})`); if(this.tail){let w=Math.sin(c)*15; this.tail.setAttribute('transform',`translate(28, 10) rotate(${w})`);} break; }
+                    case 'sit': if(this.bodyGroup) this.bodyGroup.setAttribute('transform','translate(0, 8) scale(1.05, 0.95)'); if(this.headGroup) this.headGroup.setAttribute('transform','translate(0, -4)'); if(this.legBack) this.legBack.setAttribute('transform','translate(14, 28) rotate(45) scale(0.8)'); if(this.legFront) this.legFront.setAttribute('transform','translate(-12, 28) rotate(-45) scale(0.8)'); if(this.armLeft) this.armLeft.setAttribute('transform','translate(-14, 10) rotate(20)'); if(this.armRight) this.armRight.setAttribute('transform','translate(14, 10) rotate(-20)'); break;
+                    case 'love': {let lb=Math.abs(Math.sin(t*0.6))*-12; if(this.bodyGroup) this.bodyGroup.setAttribute('transform',`translate(0, ${lb})`); if(this.headGroup) this.headGroup.setAttribute('transform',`translate(0, ${-12+lb})`); if(this.armRight) this.armRight.setAttribute('transform','translate(16, -4) rotate(-75)'); break; }
+                    case 'angry': {let s=(Math.random()-0.5)*4; if(this.bodyGroup) this.bodyGroup.setAttribute('transform',`translate(${s}, 0)`); if(this.armLeft) this.armLeft.setAttribute('transform','translate(-20, 4) rotate(-35)'); if(this.armRight) this.armRight.setAttribute('transform','translate(20, 4) rotate(35)'); break; }
+                    case 'sleep': {let sb=Math.sin(t*0.1)*2; if(this.bodyGroup) this.bodyGroup.setAttribute('transform',`translate(0, 6) scale(1, ${0.92+sb*0.02})`); if(this.headGroup) this.headGroup.setAttribute('transform',`translate(4, -2) rotate(12)`); if(this.armLeft) this.armLeft.setAttribute('transform','translate(-14, 14) rotate(60)'); if(this.armRight) this.armRight.setAttribute('transform','translate(14, 14) rotate(-60)'); break; }
                 }
             }
-
-            update(globalSpeed) {
-                this.speedMultiplier = globalSpeed;
-                if (this.isDragging) {
-                    this.updateTransformAnimation(0);
-                    this.updatePosition();
-                    return;
-                }
-                this.stateTimer--;
-                if (this.stateTimer <= 0) {
-                    this.pickNewState();
-                }
-                let animTick = Date.now() / 100;
-                if (this.state === 'walk') {
-                    const dx = this.targetX - this.x;
-                    const dy = this.targetY - this.y;
-                    const dist = Math.hypot(dx, dy);
-                    if (dist < 15 || this.x <= 20 || this.x >= window.innerWidth - 120 || this.y <= 20 || this.y >= window.innerHeight - 120) {
-                        this.targetX = this.x + (Math.random() - 0.5) * 300;
-                        this.targetY = this.y + (Math.random() - 0.5) * 300;
-                    }
-                    const speed = 1.2 * this.speedMultiplier;
-                    this.x += (dx / dist) * speed;
-                    this.y += (dy / dist) * speed;
-                    this.clampToBounds();
-                    if (dx !== 0) this.facing = dx > 0 ? 1 : -1;
-                }
-                this.updateTransformAnimation(animTick);
-                this.updatePosition();
-            }
-
-            updateTransformAnimation(t) {
-                this.rootGroup.setAttribute('transform', `translate(60, 60) scale(${this.facing}, 1)`);
-                if (this.armLeft) this.armLeft.setAttribute('transform', 'translate(-16, 2)');
-                if (this.armRight) this.armRight.setAttribute('transform', 'translate(16, 2)');
-                if (this.legBack) this.legBack.setAttribute('transform', 'translate(16, 22)');
-                if (this.legFront) this.legFront.setAttribute('transform', 'translate(-14, 22)');
-                if (this.headGroup) this.headGroup.setAttribute('transform', 'translate(0, -12)');
-                if (this.bodyGroup) this.bodyGroup.setAttribute('transform', 'translate(0, 0)');
-                if (this.tail) this.tail.setAttribute('transform', 'translate(28, 10)');
-                let breath = Math.sin(t * 0.15) * 1.5;
-                switch (this.state) {
-                    case 'idle':
-                        if (this.bodyGroup) this.bodyGroup.setAttribute('transform', `translate(0, ${breath}) scale(1, ${1 + breath * 0.01})`);
-                        if (this.headGroup) this.headGroup.setAttribute('transform', `translate(0, ${-12 + breath * 0.5})`);
-                        if (this.tail) { let tailSway = Math.sin(t * 0.3) * 8; this.tail.setAttribute('transform', `translate(28, 10) rotate(${tailSway})`); }
-                        break;
-                    case 'walk':
-                        let walkCycle = t * 0.8 * this.speedMultiplier;
-                        let legSwingBack = Math.sin(walkCycle) * 15;
-                        let legSwingFront = Math.sin(walkCycle + Math.PI) * 15;
-                        let bodyBounce = Math.abs(Math.sin(walkCycle * 2)) * -4;
-                        if (this.bodyGroup) this.bodyGroup.setAttribute('transform', `translate(0, ${bodyBounce})`);
-                        if (this.headGroup) this.headGroup.setAttribute('transform', `translate(0, ${-12 + bodyBounce * 0.5})`);
-                        if (this.legBack) this.legBack.setAttribute('transform', `translate(16, 22) rotate(${legSwingBack})`);
-                        if (this.legFront) this.legFront.setAttribute('transform', `translate(-14, 22) rotate(${legSwingFront})`);
-                        if (this.armLeft) this.armLeft.setAttribute('transform', `translate(-16, 2) rotate(${-legSwingBack * 0.8})`);
-                        if (this.armRight) this.armRight.setAttribute('transform', `translate(16, 2) rotate(${-legSwingFront * 0.8})`);
-                        if (this.tail) { let tailWag = Math.sin(walkCycle) * 15; this.tail.setAttribute('transform', `translate(28, 10) rotate(${tailWag})`); }
-                        break;
-                    case 'sit':
-                        if (this.bodyGroup) this.bodyGroup.setAttribute('transform', 'translate(0, 8) scale(1.05, 0.95)');
-                        if (this.headGroup) this.headGroup.setAttribute('transform', 'translate(0, -4)');
-                        if (this.legBack) this.legBack.setAttribute('transform', 'translate(14, 28) rotate(45) scale(0.8)');
-                        if (this.legFront) this.legFront.setAttribute('transform', 'translate(-12, 28) rotate(-45) scale(0.8)');
-                        if (this.armLeft) this.armLeft.setAttribute('transform', 'translate(-14, 10) rotate(20)');
-                        if (this.armRight) this.armRight.setAttribute('transform', 'translate(14, 10) rotate(-20)');
-                        break;
-                    case 'love':
-                        let loveBounce = Math.abs(Math.sin(t * 0.6)) * -12;
-                        if (this.bodyGroup) this.bodyGroup.setAttribute('transform', `translate(0, ${loveBounce})`);
-                        if (this.headGroup) this.headGroup.setAttribute('transform', `translate(0, ${-12 + loveBounce})`);
-                        if (this.armRight) this.armRight.setAttribute('transform', 'translate(16, -4) rotate(-75)');
-                        break;
-                    case 'angry':
-                        let shake = (Math.random() - 0.5) * 4;
-                        if (this.bodyGroup) this.bodyGroup.setAttribute('transform', `translate(${shake}, 0)`);
-                        if (this.armLeft) this.armLeft.setAttribute('transform', 'translate(-20, 4) rotate(-35)');
-                        if (this.armRight) this.armRight.setAttribute('transform', 'translate(20, 4) rotate(35)');
-                        break;
-                    case 'sleep':
-                        let sleepBreath = Math.sin(t * 0.1) * 2;
-                        if (this.bodyGroup) this.bodyGroup.setAttribute('transform', `translate(0, 6) scale(1, ${0.92 + sleepBreath * 0.02})`);
-                        if (this.headGroup) this.headGroup.setAttribute('transform', `translate(4, -2) rotate(12)`);
-                        if (this.armLeft) this.armLeft.setAttribute('transform', 'translate(-14, 14) rotate(60)');
-                        if (this.armRight) this.armRight.setAttribute('transform', 'translate(14, 14) rotate(-60)');
-                        break;
-                }
-            }
-
-            updatePosition() {
-                this.wrapper.style.left = `${this.x}px`;
-                this.wrapper.style.top = `${this.y}px`;
-            }
+            updatePosition(){ this.wrapper.style.left=`${this.x}px`; this.wrapper.style.top=`${this.y}px`; }
         }
 
-        let pets = [];
-        function spawnAllPets() {
-            document.getElementById('desktop-viewport').innerHTML = '';
-            pets = [];
-            const types = ['kitten', 'puppy', 'bunny', 'hamster', 'bear'];
-            const startX = window.innerWidth / 2 - 250;
-            types.forEach((type, index) => {
-                pets.push(new DesktopPet(type, startX + (index * 100), window.innerHeight / 2 + (Math.random() - 0.5) * 100));
-            });
+        let pets=[]; let currentSpeed=1;
+        function spawnPetsFromSettings(){
+            document.getElementById('desktop-viewport').innerHTML=''; pets=[];
+            const types = settings.selectedPets && settings.selectedPets.length ? settings.selectedPets : ALL_TYPES.slice(0, settings.petCount);
+            const startX = window.innerWidth/2 - (types.length*100)/2;
+            types.forEach((type,i)=>{ pets.push(new DesktopPet(type, startX + i*120, window.innerHeight/2 + (Math.random()-0.5)*80)); });
         }
+        window.addEventListener('mousemove',e=>pets.forEach(p=>p.onMouseMove(e)));
+        window.addEventListener('mouseup',()=>pets.forEach(p=>p.onMouseUp()));
 
-        window.addEventListener('mousemove', (e) => { pets.forEach(pet => pet.onMouseMove(e)); });
-        window.addEventListener('mouseup', () => { pets.forEach(pet => pet.onMouseUp()); });
-
-        window.addEventListener('load', () => { spawnAllPets(); requestAnimationFrame(mainLoop); });
-
-        function mainLoop() {
-            const speedVal = parseFloat(document.getElementById('speed-slider').value);
-            pets.forEach(pet => pet.update(speedVal));
-            requestAnimationFrame(mainLoop);
-        }
-
-        document.getElementById('spawn-btn').addEventListener('click', () => { spawnAllPets(); });
-        document.getElementById('reset-btn').addEventListener('click', () => { spawnAllPets(); });
-        document.getElementById('anim-select').addEventListener('change', (e) => {
-            const selectedType = document.getElementById('pet-select').value;
-            const targetState = e.target.value;
-            pets.forEach(pet => { if (pet.type === selectedType) pet.triggerState(targetState); });
+        // right-click ctx menu -> Settings
+        const ctxMenu=document.getElementById('ctx-menu');
+        document.addEventListener('contextmenu',e=>{ e.preventDefault(); ctxMenu.classList.remove('hidden'); ctxMenu.style.left=e.clientX+'px'; ctxMenu.style.top=e.clientY+'px';
+            requestAnimationFrame(()=>{ const r=ctxMenu.getBoundingClientRect(); if(r.right>window.innerWidth) ctxMenu.style.left=(window.innerWidth-r.width-8)+'px'; if(r.bottom>window.innerHeight) ctxMenu.style.top=(window.innerHeight-r.height-8)+'px'; });
         });
-        window.addEventListener('resize', () => { pets.forEach(pet => pet.clampToBounds()); });
+        document.addEventListener('click',e=>{ if(!ctxMenu.contains(e.target)) ctxMenu.classList.add('hidden'); });
+        document.addEventListener('keydown',e=>{ if(e.key==='Escape') ctxMenu.classList.add('hidden'); });
+        ctxMenu.addEventListener('click', async e=>{
+            const b=e.target.closest('button'); if(!b) return; const a=b.dataset.action; ctxMenu.classList.add('hidden');
+            if(a==='settings'){ try{ await invoke('open_settings'); } catch{ window.open('/settings.html','_blank'); } }
+            else if(a==='hide'){ try{ await invoke('hide_pet'); } catch{} }
+            else if(a==='quit'){ try{ await invoke('quit_app'); } catch{} }
+        });
+
+        if (isTauri && listenFn) {
+            try {
+                await listenFn('settings-updated', async ev=>{
+                    const u=ev.payload; if(!u) return;
+                    if(u.pet_count!==undefined) settings.petCount=u.pet_count;
+                    if(u.selected_pets) settings.selectedPets=u.selected_pets;
+                    if(u.speed!==undefined) currentSpeed=u.speed;
+                    for(const [k,v] of Object.entries(u)) await store.set(k,v);
+                    await store.save().catch(()=>{});
+                    spawnPetsFromSettings();
+                });
+                await listenFn('show-pet', async()=>{ try{ const w=await import('@tauri-apps/api/window'); await w.getCurrentWindow().show(); }catch{} });
+            } catch{}
+        }
+
+        await loadSettings();
+        spawnPetsFromSettings();
+        function mainLoop(){ pets.forEach(p=>p.update(currentSpeed)); requestAnimationFrame(mainLoop); }
+        requestAnimationFrame(mainLoop);
+        window.addEventListener('resize',()=>pets.forEach(p=>p.clampToBounds()));
     </script>
 </body>
 </html>

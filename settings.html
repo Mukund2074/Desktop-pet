@@ -4,76 +4,99 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Desktop Pet — Settings</title>
-  <link rel="stylesheet" href="/src/styles/settings.css" />
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1e293b;padding:20px}
+    h1{font-size:18px;margin-bottom:4px}
+    .subtitle{font-size:12px;color:#64748b;margin-bottom:16px}
+    section{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:14px}
+    section h3{font-size:13px;margin-bottom:10px;color:#334155}
+    label{display:flex;align-items:center;gap:8px;font-size:13px;margin:8px 0}
+    label span{flex:1}
+    input[type="range"]{flex:1}
+    select{flex:1;padding:6px 8px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px}
+    .pet-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+    .pet-grid label{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px;cursor:pointer}
+    .pet-grid label:has(input:checked){background:#eef2ff;border-color:#6366f1}
+    .pet-grid input{accent-color:#6366f1}
+    .actions{display:flex;gap:8px;margin-top:10px}
+    .actions button{flex:1;padding:8px;border-radius:8px;border:1px solid #e2e8f0;background:white;font-weight:600;cursor:pointer}
+    .actions button.primary{background:#6366f1;color:white;border-color:#6366f1}
+    footer{font-size:11px;color:#94a3b8;text-align:center;margin-top:10px}
+    #countVal{font-weight:700;color:#6366f1}
+  </style>
 </head>
 <body>
-  <div id="app">
-    <h1>🐱 Desktop Pet — Settings</h1>
-    <p class="subtitle">Everything stays local. No tracking, no network.</p>
+  <h1>🐾 Desktop Pet — Settings</h1>
+  <p class="subtitle">Choose how many cutouts to show. Pets roam the whole desktop (multi-monitor). Right-click a pet → Settings.</p>
 
-    <section>
-      <label><input type="checkbox" id="autostart" /> Start with OS</label>
-      <label><input type="checkbox" id="alwaysOnTop" checked /> Always on top</label>
-      <label><input type="checkbox" id="sound" /> Enable sounds (meow)</label>
-    </section>
+  <section>
+    <h3>How many pets to show</h3>
+    <label><span>Count: <b id="countVal">5</b></span><input type="range" id="petCount" min="1" max="5" step="1" value="5" /></label>
+    <div class="pet-grid" id="petGrid">
+      <label><input type="checkbox" value="kitten" checked /> 🐱 Kitten (Mochi)</label>
+      <label><input type="checkbox" value="puppy" checked /> 🐶 Puppy (Biscuit)</label>
+      <label><input type="checkbox" value="bunny" checked /> 🐰 Bunny (Cotton)</label>
+      <label><input type="checkbox" value="hamster" checked /> 🐹 Hamster (Pip)</label>
+      <label><input type="checkbox" value="bear" checked /> 🐻 Bear (Snowball)</label>
+    </div>
+    <p style="font-size:11px;color:#64748b;margin-top:8px;">Uncheck to hide a species. Count slider auto-adjusts to checked total.</p>
+  </section>
 
-    <section>
-      <label>Pet type
-        <select id="petType">
-          <option value="kitten">🐱 Kitten (Mochi)</option>
-          <option value="puppy">🐶 Puppy (Biscuit)</option>
-          <option value="bunny">🐰 Bunny (Clover)</option>
-          <option value="hamster">🐹 Hamster (Nuts)</option>
-          <option value="bear">🐻 Bear (Barnaby)</option>
-        </select>
-      </label>
-      <label>Pet size
-        <input type="range" id="petSize" min="1" max="2.5" step="0.25" value="1" />
-        <span id="petSizeVal">1×</span>
-      </label>
-      <label>Animation speed
-        <input type="range" id="animSpeed" min="0.5" max="2" step="0.25" value="1" />
-        <span id="animSpeedVal">1×</span>
-      </label>
-      <label>Walking frequency
-        <input type="range" id="walkFreq" min="0.2" max="1" step="0.1" value="0.5" />
-        <span id="walkFreqVal">50%</span>
-      </label>
-      <label>Walk interval
-        <select id="walkInterval">
-          <option value="auto">Auto (1–4s random)</option>
-          <option value="30">Every 30 seconds</option>
-          <option value="60">Every 1 minute</option>
-          <option value="120">Every 2 minutes</option>
-          <option value="300">Every 5 minutes</option>
-          <option value="still">Sit still (no walk)</option>
-        </select>
-      </label>
-    </section>
+  <section>
+    <h3>Speed</h3>
+    <label><span>Roaming speed</span><input type="range" id="speed" min="0.5" max="2.5" step="0.1" value="1" /></label>
+  </section>
 
-    <section class="actions">
-      <button id="sitStill">🧘 Sit still</button>
-      <button id="playNow">🧶 Play</button>
-    </section>
-
-    <section class="actions">
-      <button id="resetPos">Reset pet position</button>
-      <button id="showPet">Show pet</button>
-      <button id="quit">Quit</button>
-    </section>
-
-    <section class="privacy">
-      <h3>Privacy</h3>
-      <ul>
-        <li>No screen recording</li>
-        <li>No key/mouse tracking outside the pet</li>
-        <li>No network requests</li>
-        <li>All data stored locally via Tauri Store</li>
-      </ul>
-    </section>
-
-    <footer>v0.2.0 — offline only</footer>
+  <div class="actions">
+    <button id="saveBtn" class="primary">Save &amp; Apply</button>
+    <button id="resetBtn">Reset positions</button>
+    <button id="quitBtn">Quit</button>
   </div>
-  <script type="module" src="/src/settings.js"></script>
+  <footer>Local only — no network. Close window to hide.</footer>
+  <script type="module">
+    const isTauri = !!window.__TAURI_INTERNALS__;
+    let store, invoke, emit;
+    if (isTauri) {
+      const s = await import('@tauri-apps/plugin-store');
+      const c = await import('@tauri-apps/api/core');
+      const e = await import('@tauri-apps/api/event');
+      store = new s.LazyStore('settings.json');
+      invoke = c.invoke; emit = e.emit;
+    } else {
+      const P='desktop-pet:'; store={ get: async k=>{try{const v=localStorage.getItem(P+k);return v?JSON.parse(v):undefined;}catch{return undefined}}, set: async(k,v)=>{try{localStorage.setItem(P+k,JSON.stringify(v));}catch{}}, save: async()=>{}};
+      invoke=async()=>null; emit=async()=>{};
+    }
+    const ALL=['kitten','puppy','bunny','hamster','bear'];
+    const els={ petCount: document.getElementById('petCount'), countVal: document.getElementById('countVal'), speed: document.getElementById('speed'), grid: document.getElementById('petGrid'), saveBtn: document.getElementById('saveBtn'), resetBtn: document.getElementById('resetBtn'), quitBtn: document.getElementById('quitBtn') };
+    function getChecked(){ return [...els.grid.querySelectorAll('input:checked')].map(i=>i.value); }
+    function syncCount(){ const c=getChecked().length||1; els.petCount.value=c; els.countVal.textContent=c; }
+    els.grid.addEventListener('change', syncCount);
+    els.petCount.addEventListener('input', ()=>{
+      const n=parseInt(els.petCount.value,10); els.countVal.textContent=n;
+      const boxes=[...els.grid.querySelectorAll('input')];
+      // check first N, uncheck rest
+      boxes.forEach((b,i)=> b.checked = i < n);
+    });
+    async function load(){
+      let petCount=5, selectedPets=ALL.slice(), speed=1;
+      try{ const v=await store.get('petCount'); if(v) petCount=v; const s=await store.get('selectedPets'); if(s&&s.length) selectedPets=s; const sp=await store.get('speed'); if(sp) speed=sp; const rs=await invoke('get_settings'); if(rs){ if(rs.pet_count) petCount=rs.pet_count; if(rs.selected_pets) selectedPets=rs.selected_pets; if(rs.speed) speed=rs.speed; } }catch{}
+      els.petCount.value=petCount; els.countVal.textContent=petCount; els.speed.value=speed;
+      [...els.grid.querySelectorAll('input')].forEach(b=> b.checked = selectedPets.includes(b.value));
+      // if count mismatches checked, align
+      const checked=getChecked(); if(checked.length!==petCount){ els.petCount.value=checked.length; els.countVal.textContent=checked.length; }
+    }
+    els.saveBtn.addEventListener('click', async()=>{
+      const selected=getChecked(); const petCount=selected.length||1; const speed=parseFloat(els.speed.value);
+      for(const [k,v] of Object.entries({petCount, selectedPets:selected, speed})) await store.set(k,v);
+      await store.save().catch(()=>{});
+      try{ await invoke('save_settings',{ settings:{ pet_count: petCount, selected_pets: selected, speed }});}catch{}
+      await emit('settings-updated',{ pet_count: petCount, selected_pets: selected, speed }).catch(()=>{});
+      els.saveBtn.textContent='Saved ✓'; setTimeout(()=> els.saveBtn.textContent='Save & Apply',1200);
+    });
+    els.resetBtn.addEventListener('click', async()=>{ try{ await invoke('reset_position'); }catch{} await emit('reset-position',{}).catch(()=>{}); });
+    els.quitBtn.addEventListener('click', async()=>{ try{ await invoke('quit_app'); }catch{} });
+    await load();
+  </script>
 </body>
 </html>
