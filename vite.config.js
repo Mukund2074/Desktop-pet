@@ -13,10 +13,7 @@ export default defineConfig({
     sourcemap: !!process.env.TAURI_DEBUG,
     outDir: "dist",
     rollupOptions: {
-      input: {
-        main: "index.html",
-        settings: "settings.html"
-      }
+      input: "index.html"
     }
   },
 });

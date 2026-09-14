@@ -31,20 +31,6 @@
         "focus": false,
         "acceptFirstMouse": true,
         "contentProtected": false
-      },
-      {
-        "label": "settings",
-        "title": "Desktop Pet — Settings",
-        "url": "/settings.html",
-        "width": 420,
-        "height": 560,
-        "transparent": false,
-        "decorations": true,
-        "resizable": false,
-        "alwaysOnTop": false,
-        "visible": false,
-        "skipTaskbar": false,
-        "center": true
       }
     ],
     "security": {
