@@ -111,6 +111,7 @@ class DesktopPet {
     const wrapper = document.createElement("div");
     wrapper.className = "pet-wrapper";
     wrapper.dataset.pet = type;
+    wrapper.setAttribute("data-tauri-drag-region", "");
     wrapper.style.left = x + "px";
     wrapper.style.top = y + "px";
     wrapper.style.transform = `translate(${x}px,${y}px) scale(${globalScale})`;
