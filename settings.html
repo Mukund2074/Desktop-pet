@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desktop Pet — Settings</title>
+  <link rel="stylesheet" href="/src/styles/settings.css" />
+</head>
+<body>
+  <div id="app">
+    <h1>🐱 Desktop Pet — Settings</h1>
+    <p class="subtitle">Everything stays local. No tracking, no network.</p>
+
+    <section>
+      <label><input type="checkbox" id="autostart" /> Start with OS</label>
+      <label><input type="checkbox" id="alwaysOnTop" checked /> Always on top</label>
+      <label><input type="checkbox" id="sound" /> Enable sounds (meow)</label>
+    </section>
+
+    <section>
+      <label>Pet size
+        <input type="range" id="petSize" min="1" max="2.5" step="0.25" value="1" />
+        <span id="petSizeVal">1×</span>
+      </label>
+      <label>Animation speed
+        <input type="range" id="animSpeed" min="0.5" max="2" step="0.25" value="1" />
+        <span id="animSpeedVal">1×</span>
+      </label>
+      <label>Walking frequency
+        <input type="range" id="walkFreq" min="0.2" max="1" step="0.1" value="0.5" />
+        <span id="walkFreqVal">50%</span>
+      </label>
+    </section>
+
+    <section class="actions">
+      <button id="resetPos">Reset pet position</button>
+      <button id="showPet">Show pet</button>
+      <button id="quit">Quit</button>
+    </section>
+
+    <section class="privacy">
+      <h3>Privacy</h3>
+      <ul>
+        <li>No screen recording</li>
+        <li>No key/mouse tracking outside the pet</li>
+        <li>No network requests</li>
+        <li>All data stored locally via Tauri Store</li>
+      </ul>
+    </section>
+
+    <footer>v0.1.0 — offline only</footer>
+  </div>
+  <script type="module" src="/src/settings.js"></script>
+</body>
+</html>

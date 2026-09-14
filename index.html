@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desktop Pet</title>
+  <link rel="stylesheet" href="/src/styles/pet.css" />
+  <style>html,body{background:transparent !important;background-color:rgba(0,0,0,0) !important;}</style>
+</head>
+<body>
+  <div id="pet-stage" data-testid="pet-stage" data-tauri-drag-region>
+    <!-- SVG pet injected here by pet.js -->
+    <div id="pet" data-testid="pet" data-tauri-drag-region></div>
+    <div id="shadow"></div>
+
+    <!-- Speech bubble -->
+    <div id="bubble" class="hidden">
+      <span id="bubble-text"></span>
+    </div>
+  </div>
+
+  <!-- Context menu -->
+  <div id="ctx-menu" class="hidden" role="menu">
+    <button data-action="feed" role="menuitem">🐟 &nbsp; Feed</button>
+    <button data-action="play" role="menuitem">🧶 Play</button>
+    <button data-action="sleep" role="menuitem">💤 Sleep</button>
+    <button data-action="jump" role="menuitem">⭐ Jump</button>
+    <button data-action="change" role="menuitem">🐾 Change pet</button>
+    <button data-action="settings" role="menuitem">⚙️ Settings</button>
+    <div class="sep"></div>
+    <button data-action="hide" role="menuitem">👁 Hide</button>
+    <button data-action="quit" role="menuitem">✕ Quit</button>
+  </div>
+
+  <script type="module" src="/src/pet.js"></script>
+</body>
+</html>
